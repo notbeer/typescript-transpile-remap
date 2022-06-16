@@ -16,7 +16,7 @@ func main() {
 	deleteScriptsDir := buildData["buildOptions"].(map[string]interface{})["deleteScriptsDir"].(bool)
 
 	if deleteScriptsDir {
-		os.RemoveAll(tools.TsconfigCompilerOptions["outDir"].(string))
+		os.RemoveAll(tools.OutDir)
 	}
 
 	log.Println("Transpiling source folder...")
@@ -24,11 +24,10 @@ func main() {
 	logger.Error(string(output), err)
 	logger.Success("Transpiling complete")
 
-	log.Println("Starting to remap files...")
+	log.Println("Starting to map out files...")
 	tools.ImportRemap()
 	logger.Success("Mapping complete")
 
-	fmt.Println("Press any key to exit...")
-	var input string
-	fmt.Scanf(input, "%s")
+	fmt.Println("Press enter to exit...")
+	fmt.Scanln()
 }

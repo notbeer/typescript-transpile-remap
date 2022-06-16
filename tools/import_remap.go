@@ -25,16 +25,16 @@ func walkDirectory(dir string) ([]string, error) {
 }
 
 var tsconfigData = internal.JSONUnmarshal("./tsconfig.json")
-var TsconfigCompilerOptions = tsconfigData["compilerOptions"].(map[string]interface{})
-var packagePaths = TsconfigCompilerOptions["paths"].(map[string]interface{})
-var outDir = TsconfigCompilerOptions["outDir"].(string)
+var tsconfigCompilerOptions = tsconfigData["compilerOptions"].(map[string]interface{})
+var packagePaths = tsconfigCompilerOptions["paths"].(map[string]interface{})
+var OutDir = tsconfigCompilerOptions["outDir"].(string)
 
 func remapFile(filePath string) {
 	fileText, err := os.ReadFile(filePath)
 	logger.Error("Error occured while reading "+filePath+" - ", err)
 
 	var newFile string
-	var remapped = false
+	remapped := false
 
 	importRegex := regexp.MustCompile("import.+[\"'](.+)[\"']")
 
@@ -45,7 +45,7 @@ func remapFile(filePath string) {
 			for key, value := range packagePaths {
 				packagePath := value.([]interface{})[0].(string)
 				if key == packageMatches[1] {
-					rel, _ := filepath.Rel(filePath, outDir+"/"+packagePath)
+					rel, _ := filepath.Rel(filePath, OutDir+"/"+packagePath)
 					packageRoute := strings.Replace(strings.ReplaceAll(rel, "\\", "/"), "../", "./", 1)
 					newPackageName = strings.Replace(fileLine, packageMatches[1], packageRoute, 1)
 					remapped = true
@@ -73,7 +73,7 @@ func remapFile(filePath string) {
 }
 
 func ImportRemap() {
-	distPaths, _ := walkDirectory("./" + outDir)
+	distPaths, _ := walkDirectory("./" + OutDir)
 	for _, distPath := range distPaths {
 		remapFile(distPath)
 	}
